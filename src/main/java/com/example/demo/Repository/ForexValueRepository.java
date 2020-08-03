@@ -1,0 +1,11 @@
+package com.example.demo.Repository;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.repository.CrudRepository;
+
+import com.example.demo.Model.ForexValue;
+
+public interface ForexValueRepository extends MongoRepository<ForexValue, String> {
+	public ForexValue findByFromTypeAndToTypeAndDate(String fromType, String toType,String date);
+
+}
