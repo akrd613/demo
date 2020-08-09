@@ -45,7 +45,13 @@ public class TestForexServiceImpl {
 		double value=1;
 		double result=0d;
 		result=value*(forexValueRepository.findByFromTypeAndToTypeAndDate(fromType, toType,java.time.LocalDate.now().toString()).getValue());
-		double expected=forexService.getValue(fromType, toType, value);
+		double expected=0d;
+		try {
+			expected = forexService.getValue(fromType, toType, value);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		assertEquals(result, expected);
 	}
 }
