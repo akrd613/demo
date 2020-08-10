@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.example.demo.Exceptions.CustomErrorHandler;
 import com.example.demo.Exceptions.KeyNotSupportedException;
+import com.example.demo.Exceptions.MalFormedObjectException;
 
 @Service
 public class ForexServiceImpl implements ForexService {
@@ -32,14 +33,17 @@ public class ForexServiceImpl implements ForexService {
 				HttpMethod.GET, null, String.class);
 		if (responseEntiry.getStatusCode().is2xxSuccessful()) {
 			JSONObject json = new JSONObject(responseEntiry.getBody());
-			JSONObject rates = json.getJSONObject("rates");
-			double result = 0d;
-			if (rates.has(fromType) && rates.has(toType)) {
-				result = value * rates.getDouble(toType) / rates.getDouble(fromType);
-			} else
-				throw new KeyNotSupportedException("Currency values are not supported");
-			result= new BigDecimal(result).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue();
-			return result;
+			if (json.has("rates")) {
+				JSONObject rates = json.getJSONObject("rates");
+				double result = 0d;
+				if (rates.has(fromType) && rates.has(toType)) {
+					result = value * rates.getDouble(toType) / rates.getDouble(fromType);
+				} else
+					throw new KeyNotSupportedException("Currency inputs are not supported");
+				result = new BigDecimal(result).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+				return result;
+			}
+			throw new MalFormedObjectException("Unable to process request,please try later");
 		} else {
 			throw new ServiceUnavailableException("Unable to process request,please try later");
 		}
